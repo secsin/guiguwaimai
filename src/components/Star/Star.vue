@@ -1,17 +1,22 @@
 <template>
-  <div class="star" :class="'star-'+size">
-    <span class="star-item" v-for="(sc, index) in starClasses" :class="sc" :key="index"></span>
+  <div class="star" :class="'star-' + size">
+    <span
+      class="star-item"
+      v-for="(sc, index) in starClasses"
+      :class="sc"
+      :key="index"
+    ></span>
   </div>
 </template>
 
 <script>
 // 类名常量
-const CLASS_ON = 'on'
-const CLASS_HALF = 'half'
-const CLASS_OFF = 'off'
+const CLASS_ON = "on";
+const CLASS_HALF = "half";
+const CLASS_OFF = "off";
 
 export default {
-  name: 'Star',
+  name: "Star",
   props: {
     score: Number,
     size: Number
@@ -21,28 +26,28 @@ export default {
       3.2: 3 + 0 + 2
       3.5: 3 + 1 + 1  小数部分>=0.5算一个half
     */
-    starClasses () {
+    starClasses() {
       // 第一次读取计算属性时已经在解析模板了，组件实例对象生命周期处于created之后，可通过this访问所有属性和方法
-      const {score} = this
-      const sca = []
+      const { score } = this;
+      const sca = [];
       // 向sca中添加n个CLASS_ON
-      const scoreInteger = Math.floor(score)
-      for(let i = 0; i < scoreInteger; i++){
-        sca.push(CLASS_ON)
+      const scoreInteger = Math.floor(score);
+      for (let i = 0; i < scoreInteger; i++) {
+        sca.push(CLASS_ON);
       }
       // 向sca中添加0/1个CLASS_HALF
-      if((score*10 - scoreInteger*10)>=5){
-        sca.push(CLASS_HALF)
+      if (score * 10 - scoreInteger * 10 >= 5) {
+        sca.push(CLASS_HALF);
       }
       // 向sca中添加n个CLASS_OFF
-      while(sca.length<5){
-        sca.push(CLASS_OFF)
+      while (sca.length < 5) {
+        sca.push(CLASS_OFF);
       }
 
-      return sca
+      return sca;
     }
-  },
-}
+  }
+};
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">

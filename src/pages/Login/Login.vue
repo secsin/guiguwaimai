@@ -4,45 +4,95 @@
       <div class="login_header">
         <h2 class="login_logo">硅谷外卖</h2>
         <div class="login_header_title">
-          <a href="javascript:;" class="on">短信登录</a>
-          <a href="javascript:;">密码登录</a>
+          <a
+            href="javascript:;"
+            :class="{ on: loginWay }"
+            @click="loginWay = true"
+            >短信登录</a
+          >
+          <a
+            href="javascript:;"
+            :class="{ on: !loginWay }"
+            @click="loginWay = false"
+            >密码登录</a
+          >
         </div>
       </div>
       <div class="login_content">
-        <form>
-          <div class="on">
+        <form @submit.prevent="login">
+          <div :class="{ on: loginWay }">
             <section class="login_message">
-              <input type="tel" maxlength="11" placeholder="手机号" />
-              <button disabled="disabled" class="get_verification">
-                获取验证码
+              <input
+                type="text"
+                maxlength="11"
+                placeholder="手机号"
+                v-model="phone"
+              />
+              <button
+                :disabled="!rightPhone"
+                class="get_verification"
+                :class="{ right_phone: rightPhone }"
+                @click.prevent="getCode"
+              >
+                {{
+                  computedTime > 0 ? `已发送(${computedTime})s` : "获取验证码"
+                }}
               </button>
             </section>
             <section class="login_verification">
-              <input type="tel" maxlength="8" placeholder="验证码" />
+              <input
+                type="text"
+                maxlength="6"
+                placeholder="验证码"
+                v-model="code"
+              />
             </section>
             <section class="login_hint">
               温馨提示：未注册硅谷外卖帐号的手机号，登录时将自动注册，且代表已同意
               <a href="javascript:;">《用户服务协议》</a>
             </section>
           </div>
-          <div>
+          <div :class="{ on: !loginWay }">
             <section>
               <section class="login_message">
                 <input
-                  type="tel"
+                  type="text"
                   maxlength="11"
                   placeholder="手机/邮箱/用户名"
+                  v-model="name"
                 />
               </section>
               <section class="login_verification">
-                <input type="tel" maxlength="8" placeholder="密码" />
-                <div class="switch_button off">
-                  <div class="switch_circle"></div>
-                  <span class="switch_text">...</span>
+                <input
+                  type="text"
+                  maxlength="8"
+                  placeholder="密码"
+                  v-if="showPwd"
+                  v-model="pwd"
+                />
+                <input
+                  type="password"
+                  maxlength="8"
+                  placeholder="密码"
+                  v-else
+                  v-model="pwd"
+                />
+                <div
+                  class="switch_button"
+                  :class="showPwd ? 'on' : 'off'"
+                  @click="showPwd = !showPwd"
+                >
+                  <div class="switch_circle" :class="{ right: showPwd }"></div>
+                  <span class="switch_text">{{ showPwd ? "abc" : "..." }}</span>
                 </div>
               </section>
               <section class="login_message">
-                <input type="text" maxlength="11" placeholder="验证码" />
+                <input
+                  type="text"
+                  maxlength="11"
+                  placeholder="验证码"
+                  v-model="captcha"
+                />
                 <img
                   class="get_verification"
                   src="./images/captcha.svg"
@@ -59,20 +109,91 @@
         <i class="iconfont icon-jiantou2"></i>
       </a>
     </div>
+    <AlertTip :alertText="AlertText" v-show="showAlert" @closeTip="closeTip" />
   </section>
 </template>
 
 <script>
+import AlertTip from "@/components/AlertTip/AlertTip";
 export default {
   name: "GshopLogin",
 
   data() {
-    return {};
+    return {
+      loginWay: true, // true短信登陆
+      phone: "",
+      showPwd: false,
+      computedTime: 0, // 计时时间
+      code: "",
+      name: "",
+      pwd: "",
+      captcha: "",
+      AlertText: "", //提示文本
+      showAlert: false
+    };
   },
 
   mounted() {},
 
-  methods: {}
+  methods: {
+    // 获取验证码
+    getCode() {
+      // alert(1);
+      if (!this.computedTime) {
+        this.computedTime = 30;
+        const intervalId = setInterval(() => {
+          this.computedTime--;
+          if (this.computedTime <= 0) {
+            clearInterval(intervalId);
+          }
+        }, 1000);
+        // 发送ajax请求
+      }
+    },
+    // 弹出提示信息
+    showMessage(AlertText) {
+      this.AlertText = AlertText;
+      this.showAlert = true;
+    },
+    closeTip() {
+      this.showAlert = false;
+      this.AlertText = "";
+    },
+    // 登陆验证
+    login() {
+      // 短信登陆
+      if (this.loginWay) {
+        const { rightPhone, phone, code } = this;
+        if (!this.rightPhone) {
+          // 手机号格式不对
+          this.showMessage("手机号格式不对");
+        } else if (!/^\d{6}$/.test(code)) {
+          // 验证码格式不对
+          this.showMessage("验证码格式不对");
+        }
+      } else {
+        const { name, pwd, captcha } = this;
+        if (!this.name) {
+          // 名字必须填写
+          this.showMessage("请填写用户名");
+        } else if (!this.pwd) {
+          // 密码必须填写
+          this.showMessage("请填写密码");
+        } else if (!this.captcha) {
+          // 验证码必须填写
+          this.showMessage("请填写验证码");
+        }
+      }
+    }
+  },
+
+  computed: {
+    rightPhone() {
+      return /^1\d{10}$/.test(this.phone);
+    }
+  },
+
+  components: { AlertTip }
 };
 </script>
 
@@ -136,6 +257,8 @@ export default {
               color #ccc
               font-size 14px
               background transparent
+              &.right_phone
+                color black
           .login_verification
             position relative
             margin-top 16px
@@ -175,6 +298,8 @@ export default {
                 background #fff
                 box-shadow 0 2px 4px 0 rgba(0,0,0,.1)
                 transition transform .3s
+                &.right
+                  transform translateX(30px)
           .login_hint
             margin-top 12px
             color #999

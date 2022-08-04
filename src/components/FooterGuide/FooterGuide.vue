@@ -55,7 +55,9 @@ export default {
     return {};
   },
 
-  mounted() {},
+  mounted() {
+    // this.$store.dispatch("getAddress");
+  },
 
   methods: {
     goTo(path) {
