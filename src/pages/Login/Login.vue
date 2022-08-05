@@ -95,8 +95,10 @@
                 />
                 <img
                   class="get_verification"
-                  src="./images/captcha.svg"
+                  src="http://localhost:4000/captcha"
                   alt="captcha"
+                  @click="getCaptcha"
+                  ref="captcha"
                 />
               </section>
             </section>
@@ -114,6 +116,8 @@
 </template>
 
 <script>
+import { reqSendCode, reqSmsLogin, reqPwdLogin } from "../../api";
+
 import AlertTip from "@/components/AlertTip/AlertTip";
 export default {
   name: "GshopLogin",
@@ -137,17 +141,29 @@ export default {
 
   methods: {
     // 获取验证码
-    getCode() {
+    async getCode() {
       // alert(1);
       if (!this.computedTime) {
         this.computedTime = 30;
-        const intervalId = setInterval(() => {
+        this.intervalId = setInterval(() => {
           this.computedTime--;
           if (this.computedTime <= 0) {
-            clearInterval(intervalId);
+            clearInterval(this.intervalId);
           }
         }, 1000);
         // 发送ajax请求
+        const result = await reqSendCode(this.phone);
+        // 出错时
+        if (result.code === 1) {
+          // 显示错误信息
+          this.showMessage(result.msg);
+          // 清除倒计时
+          if (this.computedTime) {
+            this.computedTime = 0;
+            clearInterval(this.intervalId);
+            // this.intervalId = undefined;
+          }
+        }
       }
     },
     // 弹出提示信息
@@ -155,34 +171,67 @@ export default {
       this.AlertText = AlertText;
       this.showAlert = true;
     },
+    // 关闭提示框
     closeTip() {
       this.showAlert = false;
       this.AlertText = "";
     },
+    // 刷新验证码的图
+    getCaptcha() {
+      this.$refs.captcha.src =
+        "http://localhost:4000/captcha?time=" + Date.now();
+    },
     // 登陆验证
-    login() {
+    async login() {
+      let result;
       // 短信登陆
       if (this.loginWay) {
         const { rightPhone, phone, code } = this;
         if (!this.rightPhone) {
           // 手机号格式不对
           this.showMessage("手机号格式不对");
+          return;
         } else if (!/^\d{6}$/.test(code)) {
           // 验证码格式不对
           this.showMessage("验证码格式不对");
+          return;
         }
+        // 发送ajax请求短信登录
+        result = await reqSmsLogin(phone, code);
       } else {
         const { name, pwd, captcha } = this;
         if (!this.name) {
           // 名字必须填写
           this.showMessage("请填写用户名");
+          return;
         } else if (!this.pwd) {
           // 密码必须填写
           this.showMessage("请填写密码");
+          return;
         } else if (!this.captcha) {
           // 验证码必须填写
           this.showMessage("请填写验证码");
+          return;
         }
+        // 发送ajax请求密码登录
+        result = await reqPwdLogin({ name, pwd, captcha });
+      }
+      // 清除倒计时
+      if (this.computedTime) {
+        this.computedTime = 0;
+        clearInterval(this.intervalId);
+        // this.intervalId = undefined;
+      }
+      if (result.code === 0) {
+        const user = result.data;
+        // 保存到vuex
+        this.$store.dispatch("recordUser", user);
+        // 跳转到个人中心
+        this.$router.replace("/profile");
+      } else {
+        const msg = result.msg;
+        this.showMessage(msg);
+        this.getCaptcha();
       }
     }
   },
