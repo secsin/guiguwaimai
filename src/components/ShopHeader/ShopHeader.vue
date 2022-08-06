@@ -1,5 +1,6 @@
 <template>
   <div class="shop-header">
+    <!-- backgroundImage不是background-image -->
     <nav class="shop-nav" :style="{ backgroundImage: `url(${info.bgImg})` }">
       <a class="back" @click="$router.back()">
         <i class="iconfont icon-arrow_left"></i>
