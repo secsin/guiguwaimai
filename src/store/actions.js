@@ -6,7 +6,11 @@ import {
   RESET_USER_INFO,
   RECEIVE_GOODS,
   RECEIVE_RATINGS,
-  RECEIVE_INFO
+  RECEIVE_INFO,
+  INCREMENT_FOOD_COUNT,
+  DECREMENT_FOOD_COUNT,
+  CLEAR_CART,
+  RECEIVE_SEARCH_SHOPS
 } from "./mutation-types";
 import {
   reqAddress,
@@ -16,7 +20,8 @@ import {
   reqLogout,
   reqShopGoods,
   reqShopInfo,
-  reqShopRatings
+  reqShopRatings,
+  reqSearchShop
 } from "../api";
 
 export default {
@@ -29,7 +34,6 @@ export default {
       commit(RECEIVE_ADDRESS, { address });
     }
   },
-
   // 异步获取轮播数据
   async getCategorys({ commit }) {
     const result = await reqCategorys();
@@ -38,7 +42,6 @@ export default {
       commit(RECEIVE_CATEGORYS, { categorys });
     }
   },
-
   // 异步获取附近商家
   async getShops({ commit, state }) {
     const { longitude, latitude } = state;
@@ -48,12 +51,10 @@ export default {
       commit(RECEIVE_SHOPS, { shops });
     }
   },
-
   // 同步获取用户信息
   recordUser({ commit }, userInfo) {
     commit(RECEIVE_USER_INFO, { userInfo });
   },
-
   // 异步获取用户信息
   async getUserInfo({ commit }) {
     const result = await reqUserInfo();
@@ -62,7 +63,6 @@ export default {
       commit(RECEIVE_USER_INFO, { userInfo });
     }
   },
-
   // 异步登出
   async logout({ commit }) {
     const result = await reqLogout();
@@ -70,7 +70,6 @@ export default {
       commit(RESET_USER_INFO);
     }
   },
-
   // 异步获取商家商品信息
   async getShopGoods({ commit }, callback) {
     const result = await reqShopGoods();
@@ -95,6 +94,27 @@ export default {
     if (result.code === 0) {
       const ratings = result.data;
       commit(RECEIVE_RATINGS, { ratings });
+    }
+  },
+  // 同步获取商家商品信息
+  updateFoodCount({ commit }, { isAdd, food }) {
+    if (isAdd) {
+      commit(INCREMENT_FOOD_COUNT, { food });
+    } else {
+      commit(DECREMENT_FOOD_COUNT, { food });
+    }
+  },
+  // 同步获取商家商品信息
+  clearCart({ commit }) {
+    commit(CLEAR_CART);
+  },
+  // 异步获取搜索商家信息
+  async searchShops({ commit, state }, keyword) {
+    const geohash = state.latitude + "," + state.longitude;
+    const result = await reqSearchShop(geohash, keyword);
+    if (result.code === 0) {
+      const searchShops = result.data;
+      commit(RECEIVE_SEARCH_SHOPS, { searchShops });
     }
   }
 };

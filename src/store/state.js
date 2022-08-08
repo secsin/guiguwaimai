@@ -1,11 +1,13 @@
 export default {
-  latitude: 40.100038,
-  longitude: 116.36867,
+  latitude: 34.774268,
+  longitude: 113.73314,
   address: {},
   categorys: [],
   shops: [],
   userInfo: {},
   goods: [],
   ratings: [],
-  info: {}
+  info: {},
+  cartFoods: [],
+  searchShops: []
 };

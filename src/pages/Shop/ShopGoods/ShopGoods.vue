@@ -169,7 +169,7 @@ export default {
     showFood(food) {
       // 设置food
       this.food = food;
-      // 显示food组件
+      // 获取food组件对象的方法
       this.$refs.food.toggleShow();
     }
   }
