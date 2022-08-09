@@ -91,7 +91,7 @@
                   >{{ item }}</span
                 >
               </div>
-              <div class="time">{{ rating.rateTime | formatDate }}</div>
+              <div class="time">{{ rating.rateTime | dateFormat }}</div>
             </div>
           </li>
         </ul>
@@ -104,9 +104,6 @@
 import BScroll from "better-scroll";
 import { mapState, mapGetters } from "vuex";
 import Star from "@/components/Star/Star";
-const padDate = function(value) {
-  return value < 10 ? "0" + value : value;
-};
 
 export default {
   name: "ShopRatings",
@@ -157,15 +154,6 @@ export default {
         });
       });
     });
-  },
-  filters: {
-    formatDate: function(value) {
-      const date = new Date(value);
-      const year = date.getFullYear();
-      const month = padDate(date.getMonth() + 1);
-      const day = padDate(date.getDate());
-      return year + "-" + month + "-" + day;
-    }
   },
   methods: {
     setSelectType(selectType) {
