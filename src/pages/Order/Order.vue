@@ -28,7 +28,7 @@ export default {
 
 <style lang="stylus" rel="stylesheet/stylus">
 @import "../../common/stylus/mixins.styl"
-.order  //订单
+.order
   width 100%
   .header
     background-color #02a774

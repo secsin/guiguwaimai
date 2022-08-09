@@ -175,7 +175,6 @@ export default {
   bottom: 0
   left: 0
   width: 100%
-  // overflow: hidden
   background: #fff
   .overview
     display: flex
@@ -247,8 +246,8 @@ export default {
     .rating-type
       padding: 18px 0
       margin: 0 18px
-      border-1px(rgba(7, 17, 27, 0.1))
-      font-size: 0
+      bottom-border-1px(rgba(7, 17, 27, 0.1))
+      font-size: 0px
       .block
         display: inline-block
         padding: 8px 12px

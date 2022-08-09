@@ -147,7 +147,7 @@ export default {
 
 <style lang="stylus" rel="stylesheet/stylus">
 @import "../../common/stylus/mixins.styl"
-.profile //我的
+.profile
   width 100%
   overflow hidden
   .header

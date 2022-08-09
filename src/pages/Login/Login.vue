@@ -336,7 +336,6 @@ export default {
               &.on
                 background #02a774
               >.switch_circle
-                //transform translateX(27px)
                 position absolute
                 top -1px
                 left -1px
